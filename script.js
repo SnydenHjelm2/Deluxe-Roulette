@@ -120,6 +120,9 @@ const driver = () => {
         });
     });
 
+    //lägg till stöd för "click" på alla nummer
+    //börja koda själva spelet (så man kan betta)
+
     buttons.reset.addEventListener("click", bets.reset);
 }
 
