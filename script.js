@@ -8,39 +8,25 @@ const balance = {
 
     span: document.querySelector("#balance"),
 
+    subtract: (amount) => {
+        balance.bal -= amount;
+    },
+
     update: (amount, multi) => {
         if (!multi) {
-            balance.bal -= amount;
+            balance.subtract(amount);
             document.querySelector("#status").textContent = `You lost ${amount}`;
         } else {
             balance.bal += amount * multi;
             document.querySelector("#status").textContent = `You won ${amount * multi}!`;
         }
+        balance.span.textContent = balance.bal;
     }
 }
 
 const bets = {
     bet: (amount) => {
-        if (amount > balance.bal || amount <= 0) {
-            document.querySelector("#status").textContent = "Bet can't be larger than balance or 0";
-            return;
-        }
-        let marked = document.querySelectorAll(".marked");
-        let markedNums = document.querySelector(".marked-num");
-
-        document.querySelector("#rolled").textContent = "Rolling...";
-        let num = numbers.draw();
-        setTimeout(() => {
-            document.querySelector("#rolled").textContent = `Rolled: ${num} (${numbers.color(num)})`;
-            bets.reset();
-            numbers.allNumberDivs.forEach(x => {
-                if (x.number !== num) x.classList.add("greyd-out");
-            });
-
-            marked.forEach(x => {
-
-            })
-        }, 4000);
+        
     },
 
     bets: [],
@@ -51,9 +37,7 @@ const bets = {
     },
 
     reset: () => {
-        numbers.allNumberDivs.forEach(x => {
-            x.classList.remove("hover-red", "hover-black", "hover-green", "marked", "greyd-out");
-        });
+
     }
 }
 
@@ -102,94 +86,6 @@ const driver = () => {
     let nums = document.querySelectorAll(`#numbers div`);
     let green = document.querySelector(".green");
     numbers.allNumberDivs = [...nums, green];
-
-    for (let button in buttons) {
-        buttons[button].addEventListener("mouseenter", () => {
-            if (buttons[button].id === "bet" || buttons[button].id === "reset") return;
-            numbers.allNumberDivs.forEach(x => {
-                if (!x.classList.contains(`${buttons[button].id}`) && !x.classList.contains("marked")) {
-                    if (numbers.color(x.number) === "red") x.classList.add("hover-red")
-                    else if (numbers.color(x.number) === "black") x.classList.add("hover-black")
-                    else x.classList.add("hover-green");
-                };
-            });
-            document.querySelector("#status").textContent = `Pays: ${bets.odds(buttons[button].id)}`;
-        });
-
-        buttons[button].addEventListener("mouseleave", () => {
-            if (buttons[button].id === "bet" || buttons[button].id === "reset") return;
-            numbers.allNumberDivs.forEach(x => {
-                x.classList.remove("hover-red", "hover-black", "hover-green");
-            });
-            document.querySelector("#status").textContent = "...";
-        });
-
-        buttons[button].addEventListener("click", () => {
-            if (buttons[button].id === "bet" || buttons[button].id === "reset") return;
-            numbers.allNumberDivs.forEach(x => {
-                if (x.classList.contains("marked") && x.classList.contains(`${buttons[button].id}`)) x.classList.remove("marked")
-                else if (x.classList.contains("marked") || x.classList.contains("marked-num")) return;
-
-                if (!x.classList.contains("hover-red") && !x.classList.contains("hover-black") && !x.classList.contains("hover-green")) {
-                    x.classList.add("marked");
-                    x.classList.remove("greyd-out");
-                } else {
-                    x.classList.add("greyd-out");
-                }
-            })
-        });
-    }
-
-    numbers.allNumberDivs.forEach(x => {
-        x.addEventListener("mouseenter", () => {
-            numbers.allNumberDivs.forEach(y => {
-                if (y.number !== x.number) {
-                    if (!y.classList.contains("marked") || !y.classList.contains("marked-num")) {
-                        if (numbers.color(y.number) === "red") y.classList.add("hover-red")
-                        else if (numbers.color(y.number) === "black") y.classList.add("hover-black")
-                        else y.classList.add("hover-green");
-                    }
-                }
-            });
-            document.querySelector("#status").textContent = `Pays: ${bets.odds("green")}`;
-        });
-    });
-
-    numbers.allNumberDivs.forEach(x => {
-        x.addEventListener("mouseleave", () => {
-            numbers.allNumberDivs.forEach(y => {
-                y.classList.remove("hover-red", "hover-black", "hover-green");
-            });
-            document.querySelector("#status").textContent = "...";
-        });
-    });
-
-    numbers.allNumberDivs.forEach(x => {
-        x.addEventListener("click", () => {
-            if (x.classList.contains("marked-num")) x.classList.remove("marked-num")
-            else {
-                x.classList.add("marked-num");
-                x.classList.remove("greyd-out");
-            }
-
-            numbers.allNumberDivs.forEach(y => {
-                if (!y.classList.contains("marked") || !y.classList.contains("marked-num")) y.classList.add("greyd-out");
-            });
-        });
-    });
-
-    //hover / greyout / mark behövs cleanas upp - finns lite buggar kvar
-    //ex när man valt ett bet via knapparna och sedan hovrar över ett nummer
-
-    balance.span.textContent = balance.bal;
-
-    buttons.balance.addEventListener("click", balance.reset);
-    
-    buttons.bet.addEventListener("click", () => {
-        bets.bet(parseInt(document.querySelector("#amount").value));
-    });
-
-    buttons.reset.addEventListener("click", bets.reset);
 }
 
 const numbers = {
