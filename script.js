@@ -1,6 +1,46 @@
-const bets = {
-    bet: () => {
+const balance = {
+    bal: 1000,
 
+    reset: () => {
+        balance.bal = 1000;
+        balance.span.textContent = balance.bal;
+    },
+
+    span: document.querySelector("#balance"),
+
+    update: (amount, multi) => {
+        if (!multi) {
+            balance.bal -= amount;
+            document.querySelector("#status").textContent = `You lost ${amount}`;
+        } else {
+            balance.bal += amount * multi;
+            document.querySelector("#status").textContent = `You won ${amount * multi}!`;
+        }
+    }
+}
+
+const bets = {
+    bet: (amount) => {
+        if (amount > balance.bal || amount <= 0) {
+            document.querySelector("#status").textContent = "Bet can't be larger than balance or 0";
+            return;
+        }
+        let marked = document.querySelectorAll(".marked");
+        let markedNums = document.querySelector(".marked-num");
+
+        document.querySelector("#rolled").textContent = "Rolling...";
+        let num = numbers.draw();
+        setTimeout(() => {
+            document.querySelector("#rolled").textContent = `Rolled: ${num} (${numbers.color(num)})`;
+            bets.reset();
+            numbers.allNumberDivs.forEach(x => {
+                if (x.number !== num) x.classList.add("greyd-out");
+            });
+
+            marked.forEach(x => {
+
+            })
+        }, 4000);
     },
 
     bets: [],
@@ -18,6 +58,8 @@ const bets = {
 }
 
 const buttons = {
+    balance: document.querySelector("#reset-balance"),
+
     bet: document.querySelector("#bet"),
 
     black: document.querySelector("#black"),
@@ -65,7 +107,7 @@ const driver = () => {
         buttons[button].addEventListener("mouseenter", () => {
             if (buttons[button].id === "bet" || buttons[button].id === "reset") return;
             numbers.allNumberDivs.forEach(x => {
-                if (!x.classList.contains(`${buttons[button].id}`)) {
+                if (!x.classList.contains(`${buttons[button].id}`) && !x.classList.contains("marked")) {
                     if (numbers.color(x.number) === "red") x.classList.add("hover-red")
                     else if (numbers.color(x.number) === "black") x.classList.add("hover-black")
                     else x.classList.add("hover-green");
@@ -86,7 +128,7 @@ const driver = () => {
             if (buttons[button].id === "bet" || buttons[button].id === "reset") return;
             numbers.allNumberDivs.forEach(x => {
                 if (x.classList.contains("marked") && x.classList.contains(`${buttons[button].id}`)) x.classList.remove("marked")
-                else if (x.classList.contains("marked")) return;
+                else if (x.classList.contains("marked") || x.classList.contains("marked-num")) return;
 
                 if (!x.classList.contains("hover-red") && !x.classList.contains("hover-black") && !x.classList.contains("hover-green")) {
                     x.classList.add("marked");
@@ -102,9 +144,11 @@ const driver = () => {
         x.addEventListener("mouseenter", () => {
             numbers.allNumberDivs.forEach(y => {
                 if (y.number !== x.number) {
-                    if (numbers.color(y.number) === "red") y.classList.add("hover-red")
-                    else if (numbers.color(y.number) === "black") y.classList.add("hover-black")
-                    else y.classList.add("hover-green");
+                    if (!y.classList.contains("marked") || !y.classList.contains("marked-num")) {
+                        if (numbers.color(y.number) === "red") y.classList.add("hover-red")
+                        else if (numbers.color(y.number) === "black") y.classList.add("hover-black")
+                        else y.classList.add("hover-green");
+                    }
                 }
             });
             document.querySelector("#status").textContent = `Pays: ${bets.odds("green")}`;
@@ -120,8 +164,30 @@ const driver = () => {
         });
     });
 
-    //lägg till stöd för "click" på alla nummer
-    //börja koda själva spelet (så man kan betta)
+    numbers.allNumberDivs.forEach(x => {
+        x.addEventListener("click", () => {
+            if (x.classList.contains("marked-num")) x.classList.remove("marked-num")
+            else {
+                x.classList.add("marked-num");
+                x.classList.remove("greyd-out");
+            }
+
+            numbers.allNumberDivs.forEach(y => {
+                if (!y.classList.contains("marked") || !y.classList.contains("marked-num")) y.classList.add("greyd-out");
+            });
+        });
+    });
+
+    //hover / greyout / mark behövs cleanas upp - finns lite buggar kvar
+    //ex när man valt ett bet via knapparna och sedan hovrar över ett nummer
+
+    balance.span.textContent = balance.bal;
+
+    buttons.balance.addEventListener("click", balance.reset);
+    
+    buttons.bet.addEventListener("click", () => {
+        bets.bet(parseInt(document.querySelector("#amount").value));
+    });
 
     buttons.reset.addEventListener("click", bets.reset);
 }

@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>Deluxe Roulette</h1>
+    <p>Balance: <span id="balance"></span></p>
     <p id="rolled">...</p>
     <p id="status">...</p>
     <div id="board">
@@ -31,9 +32,11 @@
         <button id="third">3rd12</button>
     </div>
     <div id="bets">
+        <input placeholder="Enter bet..." id="amount" type="number">
         <button id="bet">Bet</button>
         <button id="reset">Reset all bets</button>
     </div>
+    <button id="reset-balance">Reset Balance</button>
     <script src="script.js"></script>
 </body>
 </html>
