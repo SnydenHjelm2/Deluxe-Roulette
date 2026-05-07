@@ -10,16 +10,12 @@ const balance = {
 
     subtract: (amount) => {
         balance.bal -= amount;
+        balance.span.textContent = balance.bal;
     },
 
     update: (amount, multi) => {
-        if (!multi) {
-            balance.subtract(amount);
-            document.querySelector("#status").textContent = `You lost ${amount}`;
-        } else {
-            balance.bal += amount * multi;
-            document.querySelector("#status").textContent = `You won ${amount * multi}!`;
-        }
+        balance.bal += amount * multi;
+        document.querySelector("#status").textContent = `You won ${amount * multi}!`;
         balance.span.textContent = balance.bal;
     }
 }
@@ -74,8 +70,9 @@ const driver = () => {
         if (x === 0) return;
         let div = document.createElement("div");
         div.textContent = x;
-        div.classList.add(numbers.color(x));
+        div.classList.add(numbers.color(x), "number");
         div.number = x;
+        div.innerHTML += `<div class="marked"></div>`;
         let types = numbers.types(x);
         types.forEach(y => {
             div.classList.add(y);
@@ -86,6 +83,12 @@ const driver = () => {
     let nums = document.querySelectorAll(`#numbers div`);
     let green = document.querySelector(".green");
     numbers.allNumberDivs = [...nums, green];
+}
+
+const elements = {
+    rolled: document.querySelector("#rolled"),
+
+    status: document.querySelector("#status")
 }
 
 const numbers = {
